@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { ingestSources } from "@/lib/ingest";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 
 function revalidateAdminAndPublic() {
@@ -106,5 +107,12 @@ export async function createSource(formData: FormData) {
     { onConflict: "name" }
   );
 
+  revalidatePath("/admin");
+}
+
+export async function runIngestion() {
+  await ingestSources();
+  revalidatePath("/");
+  revalidatePath("/media");
   revalidatePath("/admin");
 }

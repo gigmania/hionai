@@ -251,3 +251,16 @@ values
   (current_date, 'Research', 'Long-horizon agent evals are becoming the most important practical research theme.', 3, true, now()),
   (current_date, 'Capital', 'Infrastructure exposure is widening from chips into power, cooling, and networking.', 4, true, now())
 on conflict do nothing;
+
+insert into sources (name, url, feed_url, category, credibility_score, is_active)
+values
+  ('OpenAI News', 'https://openai.com/news/', 'https://openai.com/news/rss.xml', 'news', 95, true),
+  ('arXiv cs.AI', 'https://arxiv.org/list/cs.AI/recent', 'https://export.arxiv.org/rss/cs.AI', 'research', 90, true),
+  ('arXiv cs.LG', 'https://arxiv.org/list/cs.LG/recent', 'https://export.arxiv.org/rss/cs.LG', 'research', 90, true),
+  ('Hacker News Front Page', 'https://news.ycombinator.com/', 'https://news.ycombinator.com/rss', 'news', 65, true)
+on conflict (name) do update set
+  url = excluded.url,
+  feed_url = excluded.feed_url,
+  category = excluded.category,
+  credibility_score = excluded.credibility_score,
+  is_active = excluded.is_active;

@@ -73,5 +73,7 @@ Next.js pages with 60 second revalidation
 - Admins can publish, rank, score, or unpublish launches.
 - `/admin` also manages RSS/Atom sources and imported media review.
 - `/api/cron/ingest` fetches active source feeds, dedupes raw items, and creates unpublished media items for review.
+- The admin Sources panel has a manual **Run ingestion** button for immediate imports.
+- The schema seeds starter feeds for OpenAI News, arXiv cs.AI, arXiv cs.LG, and Hacker News.
 
 The admin route is open in local/dev when `ADMIN_PASSWORD` is unset. In production, set `ADMIN_PASSWORD`.

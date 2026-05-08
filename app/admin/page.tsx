@@ -1,7 +1,7 @@
 import { PageShell } from "@/components/page-shell";
 import { SectionHeading } from "@/components/section-heading";
 import { getAdminLaunches, getAdminMediaItems, getAdminSources } from "@/lib/admin-data";
-import { createSource, publishLaunch, publishMediaItem, unpublishLaunch, unpublishMediaItem } from "./actions";
+import { createSource, publishLaunch, publishMediaItem, runIngestion, unpublishLaunch, unpublishMediaItem } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -28,9 +28,16 @@ export default async function AdminPage() {
           {error ? <div className="rounded-lg border border-ember bg-white p-5 font-bold text-ember">{error}</div> : null}
 
           <section className="grid gap-4 rounded-lg border border-line bg-white p-5">
-            <div>
-              <h2 className="mb-2 text-2xl font-black">Sources</h2>
-              <p className="m-0 text-muted">Add RSS or Atom feeds. The cron job imports new items as unpublished media.</p>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="mb-2 text-2xl font-black">Sources</h2>
+                <p className="m-0 text-muted">Add RSS or Atom feeds. Cron and manual runs import new items as unpublished media.</p>
+              </div>
+              <form action={runIngestion}>
+                <button className="rounded-lg border border-ink bg-ink px-5 py-2 font-black text-white" type="submit">
+                  Run ingestion
+                </button>
+              </form>
             </div>
             <form action={createSource} className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr_110px_auto]">
               <label className="grid gap-1 text-sm font-bold">
