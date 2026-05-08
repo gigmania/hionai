@@ -2,9 +2,13 @@ import { MarketCard } from "@/components/market-card";
 import { PageShell } from "@/components/page-shell";
 import { PlaceholderNotice } from "@/components/placeholder-notice";
 import { SectionHeading } from "@/components/section-heading";
-import { marketSignals } from "@/lib/data";
+import { getMarketSignals } from "@/lib/live-data";
 
-export default function MarketsPage() {
+export const revalidate = 60;
+
+export default async function MarketsPage() {
+  const marketSignals = await getMarketSignals();
+
   return (
     <PageShell>
       <main className="bg-paper py-16">

@@ -1,9 +1,13 @@
 import { PageShell } from "@/components/page-shell";
 import { PlaceholderNotice } from "@/components/placeholder-notice";
 import { SectionHeading } from "@/components/section-heading";
-import { feedItems } from "@/lib/data";
+import { getFeedItems } from "@/lib/live-data";
 
-export default function MediaPage() {
+export const revalidate = 60;
+
+export default async function MediaPage() {
+  const feedItems = await getFeedItems();
+
   return (
     <PageShell>
       <main className="bg-paper py-16">

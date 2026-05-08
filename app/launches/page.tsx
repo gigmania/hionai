@@ -2,9 +2,13 @@ import { LaunchCard } from "@/components/launch-card";
 import { PageShell } from "@/components/page-shell";
 import { PlaceholderNotice } from "@/components/placeholder-notice";
 import { SectionHeading } from "@/components/section-heading";
-import { launches } from "@/lib/data";
+import { getLaunches } from "@/lib/live-data";
 
-export default function LaunchesPage() {
+export const revalidate = 60;
+
+export default async function LaunchesPage() {
+  const launches = await getLaunches();
+
   return (
     <PageShell>
       <main className="bg-paper py-16">

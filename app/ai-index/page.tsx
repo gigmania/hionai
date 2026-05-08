@@ -1,9 +1,13 @@
 import { PageShell } from "@/components/page-shell";
 import { PlaceholderNotice } from "@/components/placeholder-notice";
 import { SectionHeading } from "@/components/section-heading";
-import { indexBaskets } from "@/lib/data";
+import { getIndexBaskets } from "@/lib/live-data";
 
-export default function AiIndexPage() {
+export const revalidate = 60;
+
+export default async function AiIndexPage() {
+  const indexBaskets = await getIndexBaskets();
+
   return (
     <PageShell>
       <main className="bg-paper py-16">

@@ -6,17 +6,16 @@ import { PageShell } from "@/components/page-shell";
 import { PlaceholderNotice } from "@/components/placeholder-notice";
 import { SectionHeading } from "@/components/section-heading";
 import {
-  dailyBriefing,
-  feedItems,
-  indexBaskets,
   ingestionRoadmap,
-  launches,
-  marketSignals,
   productPillars,
-  researchItems
 } from "@/lib/data";
+import { getHomeData } from "@/lib/live-data";
 
-export default function Home() {
+export const revalidate = 60;
+
+export default async function Home() {
+  const { launches, marketSignals, feedItems, researchItems, indexBaskets, dailyBriefing, isFallback } = await getHomeData();
+
   return (
     <PageShell>
       <main>
@@ -163,7 +162,7 @@ export default function Home() {
                   <p className="m-0 text-white/75">{item.description}</p>
                 </article>
               ))}
-              <PlaceholderNotice />
+              {isFallback ? <PlaceholderNotice /> : null}
             </div>
           </div>
         </section>

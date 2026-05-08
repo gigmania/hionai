@@ -1,9 +1,13 @@
 import { PageShell } from "@/components/page-shell";
 import { PlaceholderNotice } from "@/components/placeholder-notice";
 import { SectionHeading } from "@/components/section-heading";
-import { researchItems } from "@/lib/data";
+import { getResearchItems } from "@/lib/live-data";
 
-export default function ResearchPage() {
+export const revalidate = 60;
+
+export default async function ResearchPage() {
+  const researchItems = await getResearchItems();
+
   return (
     <PageShell>
       <main className="bg-paper py-16">
