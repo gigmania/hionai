@@ -49,7 +49,8 @@ export const navItems = [
   { href: "/markets", label: "Markets" },
   { href: "/media", label: "Media" },
   { href: "/research", label: "Research" },
-  { href: "/ai-index", label: "Index" }
+  { href: "/ai-index", label: "Index" },
+  { href: "/submit", label: "Submit" }
 ];
 
 export const productPillars = [

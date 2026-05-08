@@ -28,6 +28,8 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 CRON_SECRET=
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=
 ```
 
 ## Supabase Setup
@@ -38,6 +40,7 @@ CRON_SECRET=
 4. Copy the project URL and anon key into Vercel env vars.
 5. Copy the service role key into Vercel as `SUPABASE_SERVICE_ROLE_KEY`.
 6. Set `CRON_SECRET` to a long random string.
+7. Set `ADMIN_PASSWORD` to protect `/admin` with basic auth. Optionally set `ADMIN_USERNAME`.
 
 Public reads are protected by row level security policies that only expose published rows. Server-side ingestion should use the service role key from API routes or cron jobs only.
 
@@ -61,3 +64,12 @@ Supabase published tables
       ↓
 Next.js pages with 60 second revalidation
 ```
+
+## Admin and Submissions
+
+- `/submit` accepts public launch submissions.
+- `/api/launches/submit` validates submissions and inserts them as unpublished launches.
+- `/admin` shows pending and published launches.
+- Admins can publish, rank, score, or unpublish launches.
+
+The admin route is open in local/dev when `ADMIN_PASSWORD` is unset. In production, set `ADMIN_PASSWORD`.
