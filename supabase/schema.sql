@@ -22,11 +22,31 @@ create table if not exists sources (
   id uuid primary key default gen_random_uuid(),
   name text not null unique,
   url text,
+  feed_url text,
   category text not null,
   credibility_score integer not null default 50 check (credibility_score between 0 and 100),
   is_active boolean not null default true,
+  last_fetched_at timestamptz,
+  last_error text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
+);
+
+alter table sources add column if not exists feed_url text;
+alter table sources add column if not exists last_fetched_at timestamptz;
+alter table sources add column if not exists last_error text;
+
+create table if not exists raw_ingest_items (
+  id uuid primary key default gen_random_uuid(),
+  source_id uuid references sources(id) on delete cascade,
+  external_id text not null,
+  title text not null,
+  url text,
+  summary text,
+  published_at timestamptz,
+  raw_payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  unique (source_id, external_id)
 );
 
 create table if not exists launches (
@@ -145,6 +165,7 @@ create trigger set_daily_briefings_updated_at before update on daily_briefings
 for each row execute function set_updated_at();
 
 alter table sources enable row level security;
+alter table raw_ingest_items enable row level security;
 alter table launches enable row level security;
 alter table market_signals enable row level security;
 alter table media_items enable row level security;
@@ -155,6 +176,10 @@ alter table daily_briefings enable row level security;
 drop policy if exists "Public can read active sources" on sources;
 create policy "Public can read active sources" on sources
 for select using (is_active = true);
+
+drop policy if exists "Raw ingest items are private" on raw_ingest_items;
+create policy "Raw ingest items are private" on raw_ingest_items
+for select using (false);
 
 drop policy if exists "Public can read published launches" on launches;
 create policy "Public can read published launches" on launches

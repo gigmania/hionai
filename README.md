@@ -71,5 +71,7 @@ Next.js pages with 60 second revalidation
 - `/api/launches/submit` validates submissions and inserts them as unpublished launches.
 - `/admin` shows pending and published launches.
 - Admins can publish, rank, score, or unpublish launches.
+- `/admin` also manages RSS/Atom sources and imported media review.
+- `/api/cron/ingest` fetches active source feeds, dedupes raw items, and creates unpublished media items for review.
 
 The admin route is open in local/dev when `ADMIN_PASSWORD` is unset. In production, set `ADMIN_PASSWORD`.
