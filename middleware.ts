@@ -9,10 +9,21 @@ function unauthorized() {
   });
 }
 
+function misconfigured() {
+  return new NextResponse("Admin password is not configured", {
+    status: 503
+  });
+}
+
 export function middleware(request: NextRequest) {
   const adminPassword = process.env.ADMIN_PASSWORD;
+  const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL);
 
   if (!adminPassword) {
+    if (isProduction) {
+      return misconfigured();
+    }
+
     return NextResponse.next();
   }
 

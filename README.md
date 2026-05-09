@@ -79,3 +79,4 @@ The default Vercel cron schedule runs once daily at 12:00 UTC. Use the `/admin` 
 - The schema seeds starter feeds for OpenAI News, arXiv cs.AI, arXiv cs.LG, and Hacker News.
 
 The admin route is open in local/dev when `ADMIN_PASSWORD` is unset. In production, set `ADMIN_PASSWORD`.
+On Vercel/production, `/admin` fails closed with a 503 if `ADMIN_PASSWORD` is missing.
