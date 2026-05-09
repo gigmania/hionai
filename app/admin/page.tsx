@@ -54,9 +54,17 @@ export default async function AdminPage() {
                     <span>kalshi {run.kalshi_upserted}</span>
                     <span>arxiv {run.arxiv_upserted}</span>
                   </div>
-                  {run.errors.length > 0 ? (
-                    <p className="mt-3 text-sm font-bold text-ember">{JSON.stringify(run.errors).slice(0, 260)}</p>
-                  ) : null}
+                  <details className="mt-3 rounded-lg border border-line bg-white p-3">
+                    <summary className="cursor-pointer font-mono text-xs font-black uppercase tracking-wide">
+                      Details {run.errors.length > 0 ? `/${run.errors.length} errors` : "/ no errors"}
+                    </summary>
+                    <p className="mt-3 text-sm text-muted">{run.summary ?? "No summary recorded."}</p>
+                    {run.errors.length > 0 ? (
+                      <pre className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap rounded bg-ink p-3 text-xs text-white">
+                        {JSON.stringify(run.errors, null, 2)}
+                      </pre>
+                    ) : null}
+                  </details>
                 </article>
               ))}
             </div>

@@ -81,6 +81,8 @@ The default Vercel cron schedule runs once daily at 12:00 UTC. Use the `/admin` 
 - Ingestion also searches Polymarket's public Gamma API for AI-related markets and publishes them to `/markets`.
 - Ingestion also imports open AI-related Kalshi markets and recent arXiv AI/ML/NLP papers.
 - `/admin` shows recent ingestion run logs with media, Polymarket, Kalshi, arXiv, and error counts.
+- `/markets` shows top 100 markets overall and can filter to the top 100 by source.
+- `/models` lists tracked AI models and links to detail pages for each model.
 
 The admin route is open in local/dev when `ADMIN_PASSWORD` is unset. In production, set `ADMIN_PASSWORD`.
 On Vercel/production, `/admin` fails closed with a 503 if `ADMIN_PASSWORD` is missing.

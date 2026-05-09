@@ -4,6 +4,7 @@ import {
   BriefcaseBusiness,
   Flame,
   Newspaper,
+  Cpu,
   Rocket,
   TrendingUp
 } from "lucide-react";
@@ -54,11 +55,24 @@ export type IndexBasket = {
   signal: string;
 };
 
+export type AiModel = {
+  slug: string;
+  name: string;
+  maker: string;
+  summary: string;
+  strengths: string[];
+  context: string;
+  modality: string;
+  access: string;
+  detailUrl: string;
+};
+
 export const navItems = [
   { href: "/launches", label: "Launches" },
   { href: "/markets", label: "Markets" },
   { href: "/media", label: "Media" },
   { href: "/research", label: "Research" },
+  { href: "/models", label: "Models" },
   { href: "/ai-index", label: "Index" },
   { href: "/submit", label: "Submit" }
 ];
@@ -93,6 +107,11 @@ export const productPillars = [
     title: "Capital",
     description: "Follow funding rounds, valuation changes, strategic investments, and ecosystem concentration.",
     icon: BriefcaseBusiness
+  },
+  {
+    title: "Models",
+    description: "Compare frontier, open-weight, coding, reasoning, multimodal, and specialist AI models.",
+    icon: Cpu
   }
 ];
 
@@ -235,6 +254,75 @@ export const researchItems: ResearchItem[] = [
     title: "Multimodal risk and refusal update",
     summary: "Tracks behavior changes across image understanding, sensitive requests, and safety boundaries.",
     level: "Practitioner"
+  }
+];
+
+export const aiModels: AiModel[] = [
+  {
+    slug: "gpt-4o",
+    name: "GPT-4o",
+    maker: "OpenAI",
+    summary: "A multimodal general-purpose model family designed for fast text, vision, and audio-native assistant experiences.",
+    strengths: ["Multimodal UX", "General reasoning", "Tool use", "Low-latency interaction"],
+    context: "Large",
+    modality: "Text, vision, audio",
+    access: "API and ChatGPT",
+    detailUrl: "https://openai.com/index/hello-gpt-4o/"
+  },
+  {
+    slug: "claude-3-5-sonnet",
+    name: "Claude 3.5 Sonnet",
+    maker: "Anthropic",
+    summary: "A strong general assistant and coding model known for writing quality, analysis, and long-context workflows.",
+    strengths: ["Writing", "Coding", "Long-context analysis", "Enterprise workflows"],
+    context: "Large",
+    modality: "Text and vision",
+    access: "API and Claude",
+    detailUrl: "https://www.anthropic.com/news/claude-3-5-sonnet"
+  },
+  {
+    slug: "gemini-1-5-pro",
+    name: "Gemini 1.5 Pro",
+    maker: "Google DeepMind",
+    summary: "A long-context multimodal model aimed at complex analysis across documents, code, video, and structured inputs.",
+    strengths: ["Long context", "Multimodal analysis", "Google ecosystem", "Document reasoning"],
+    context: "Very large",
+    modality: "Text, vision, audio, video",
+    access: "API and Gemini",
+    detailUrl: "https://deepmind.google/technologies/gemini/"
+  },
+  {
+    slug: "llama-3-1",
+    name: "Llama 3.1",
+    maker: "Meta",
+    summary: "An open-weight model family used widely for self-hosted assistants, fine-tuning, and application-specific deployments.",
+    strengths: ["Open weights", "Fine-tuning", "Self-hosting", "Ecosystem support"],
+    context: "Varies",
+    modality: "Text",
+    access: "Open weights",
+    detailUrl: "https://ai.meta.com/llama/"
+  },
+  {
+    slug: "mistral-large",
+    name: "Mistral Large",
+    maker: "Mistral AI",
+    summary: "A frontier-style commercial model from Mistral focused on multilingual reasoning, coding, and enterprise deployment.",
+    strengths: ["Multilingual", "Enterprise deployment", "Coding", "European AI stack"],
+    context: "Large",
+    modality: "Text",
+    access: "API",
+    detailUrl: "https://mistral.ai/technology/"
+  },
+  {
+    slug: "deepseek-coder",
+    name: "DeepSeek Coder",
+    maker: "DeepSeek",
+    summary: "A coding-focused model family popular for code generation, repository tasks, and open model experimentation.",
+    strengths: ["Code generation", "Open model ecosystem", "Developer workflows", "Cost efficiency"],
+    context: "Varies",
+    modality: "Text and code",
+    access: "API and open weights",
+    detailUrl: "https://www.deepseek.com/"
   }
 ];
 

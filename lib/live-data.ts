@@ -65,7 +65,7 @@ export async function getMarketSignals(): Promise<MarketSignal[]> {
     .eq("published", true)
     .order("volume", { ascending: false, nullsFirst: false })
     .order("published_at", { ascending: false })
-    .limit(20);
+    .limit(500);
 
   if (error) return seedMarketSignals;
   return fallbackIfEmpty(data as MarketSignal[] | null, seedMarketSignals);
