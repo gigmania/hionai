@@ -2,8 +2,11 @@ import { createSupabaseServiceClient } from "@/lib/supabase";
 
 type KalshiMarket = {
   ticker?: string;
+  event_ticker?: string;
   title?: string;
   subtitle?: string;
+  yes_sub_title?: string;
+  no_sub_title?: string;
   status?: string;
   yes_bid_dollars?: string;
   yes_ask_dollars?: string;
@@ -12,6 +15,8 @@ type KalshiMarket = {
   volume_fp?: string;
   volume_24h_fp?: string;
   liquidity_dollars?: string;
+  rules_primary?: string;
+  rules_secondary?: string;
 };
 
 type KalshiMarketsResponse = {
@@ -29,17 +34,46 @@ export type KalshiIngestResult = {
 const AI_KEYWORDS = [
   " ai ",
   "artificial intelligence",
+  "machine learning",
+  "llm",
   "openai",
   "chatgpt",
   "gpt",
   "anthropic",
   "claude",
   "gemini",
+  "google",
+  "alphabet",
+  "microsoft",
+  "meta",
+  "amazon",
+  "apple",
+  "tesla",
+  "xai",
   "nvidia",
+  "amd",
+  "broadcom",
+  "tsmc",
+  "arm ",
   "semiconductor",
+  "semiconductors",
   "chip",
-  "gpu"
+  "chips",
+  "gpu",
+  "data center",
+  "datacenter",
+  "cloud computing",
+  "compute",
+  "accelerator",
+  "power demand",
+  "robot",
+  "robotics",
+  "humanoid",
+  "autonomous vehicle",
+  "self-driving"
 ];
+
+const MAX_PAGES = 8;
 
 function numberValue(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -51,7 +85,9 @@ function numberValue(value: unknown): number | null {
 }
 
 function isAiMarket(market: KalshiMarket) {
-  const text = ` ${market.title ?? ""} ${market.subtitle ?? ""} `.toLowerCase();
+  const text = ` ${market.title ?? ""} ${market.subtitle ?? ""} ${market.yes_sub_title ?? ""} ${market.no_sub_title ?? ""} ${
+    market.event_ticker ?? ""
+  } ${market.rules_primary ?? ""} ${market.rules_secondary ?? ""} `.toLowerCase();
   return AI_KEYWORDS.some((keyword) => text.includes(keyword));
 }
 
@@ -102,27 +138,47 @@ export async function ingestKalshi(): Promise<KalshiIngestResult> {
   }
 
   const errors: string[] = [];
+  const seen = new Set<string>();
   let markets: KalshiMarket[] = [];
 
   try {
-    const params = new URLSearchParams({
-      limit: "1000",
-      status: "open",
-      mve_filter: "exclude"
-    });
-    const response = await fetch(`https://external-api.kalshi.com/trade-api/v2/markets?${params.toString()}`, {
-      headers: {
-        "User-Agent": "HIonAI/0.1 (+https://hionai.net)"
-      },
-      next: { revalidate: 0 }
-    });
+    let cursor: string | undefined;
 
-    if (!response.ok) {
-      throw new Error(`Kalshi markets returned ${response.status}`);
+    for (let page = 0; page < MAX_PAGES; page += 1) {
+      const params = new URLSearchParams({
+        limit: "1000",
+        status: "open"
+      });
+
+      if (cursor) params.set("cursor", cursor);
+
+      const response = await fetch(`https://external-api.kalshi.com/trade-api/v2/markets?${params.toString()}`, {
+        headers: {
+          "User-Agent": "HIonAI/0.1 (+https://hionai.net)"
+        },
+        next: { revalidate: 0 }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Kalshi markets returned ${response.status}`);
+      }
+
+      const payload = (await response.json()) as KalshiMarketsResponse;
+
+      for (const market of payload.markets ?? []) {
+        const key = market.ticker ?? market.title;
+        if (!key || seen.has(key) || !isAiMarket(market)) continue;
+        seen.add(key);
+        markets.push(market);
+      }
+
+      cursor = payload.cursor || undefined;
+      if (!cursor) break;
     }
 
-    const payload = (await response.json()) as KalshiMarketsResponse;
-    markets = (payload.markets ?? []).filter(isAiMarket).slice(0, 40);
+    markets = markets
+      .sort((a, b) => (numberValue(b.volume_24h_fp) ?? numberValue(b.volume_fp) ?? 0) - (numberValue(a.volume_24h_fp) ?? numberValue(a.volume_fp) ?? 0))
+      .slice(0, 150);
   } catch (error) {
     errors.push(error instanceof Error ? error.message : "Unknown Kalshi error");
   }
