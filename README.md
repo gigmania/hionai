@@ -78,7 +78,8 @@ The default Vercel cron schedule runs once daily at 12:00 UTC. Use the `/admin` 
 - `/admin` also manages RSS/Atom sources and imported media.
 - `/api/cron/ingest` fetches active source feeds, dedupes raw items, and auto-publishes imported media items.
 - The admin Sources panel has a manual **Run ingestion** button for immediate imports.
-- The schema seeds starter feeds for OpenAI News, arXiv cs.AI, arXiv cs.LG, and Hacker News.
+- The schema seeds starter feeds for OpenAI News, OpenAI YouTube, Two Minute Papers YouTube, arXiv cs.AI, arXiv cs.LG, and Hacker News.
+- YouTube channels can be added as media sources with category `video` using `https://www.youtube.com/feeds/videos.xml?channel_id=CHANNEL_ID`.
 - `/media` ranks stories by `popularity_score`; anonymous up/down votes update that score.
 - Ingestion also searches Polymarket's public Gamma API for AI-related markets and publishes them to `/markets`.
 - Ingestion also imports open AI-related Kalshi markets and recent arXiv AI/ML/NLP papers.

@@ -344,6 +344,8 @@ on conflict do nothing;
 insert into sources (name, url, feed_url, category, credibility_score, is_active)
 values
   ('OpenAI News', 'https://openai.com/news/', 'https://openai.com/news/rss.xml', 'news', 95, true),
+  ('OpenAI YouTube', 'https://www.youtube.com/@OpenAI', 'https://www.youtube.com/feeds/videos.xml?channel_id=UCXZCJLdBC09xxGZ6gcdrc6A', 'video', 92, true),
+  ('Two Minute Papers YouTube', 'https://www.youtube.com/@TwoMinutePapers', 'https://www.youtube.com/feeds/videos.xml?channel_id=UCbfYPyITQ-7l4upoX8nvctg', 'video', 78, true),
   ('arXiv cs.AI', 'https://arxiv.org/list/cs.AI/recent', 'https://export.arxiv.org/rss/cs.AI', 'research', 90, true),
   ('arXiv cs.LG', 'https://arxiv.org/list/cs.LG/recent', 'https://export.arxiv.org/rss/cs.LG', 'research', 90, true),
   ('Hacker News Front Page', 'https://news.ycombinator.com/', 'https://news.ycombinator.com/rss', 'news', 65, true)

@@ -50,6 +50,19 @@ function parseDate(value: unknown): string | null {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
+function objectValue(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
+}
+
+function firstText(...values: unknown[]) {
+  for (const value of values) {
+    const text = summarize(value);
+    if (text) return text;
+  }
+
+  return "";
+}
+
 function summarize(value: unknown) {
   return textValue(value)
     .replace(/<[^>]*>/g, " ")
@@ -65,10 +78,13 @@ export function parseFeed(xml: string): ParsedFeedItem[] {
 
   return [...rssItems, ...atomItems]
     .map((item) => {
+      const record = objectValue(item);
+      const mediaGroup = objectValue(record?.["media:group"]);
       const title = textValue(item.title);
-      const url = linkValue(item.link) ?? textValue(item.guid) ?? null;
-      const externalId = textValue(item.guid) || textValue(item.id) || url || title;
-      const summary = summarize(item.description ?? item.summary ?? item.content);
+      const videoId = textValue(record?.["yt:videoId"]);
+      const url = linkValue(item.link) ?? (videoId ? `https://www.youtube.com/watch?v=${videoId}` : null) ?? textValue(item.guid) ?? null;
+      const externalId = videoId || textValue(item.guid) || textValue(item.id) || url || title;
+      const summary = firstText(mediaGroup?.["media:description"], item.description, item.summary, item.content);
       const publishedAt = parseDate(item.pubDate ?? item.published ?? item.updated);
 
       return {
