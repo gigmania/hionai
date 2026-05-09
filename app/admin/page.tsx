@@ -31,7 +31,7 @@ export default async function AdminPage() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <h2 className="mb-2 text-2xl font-black">Sources</h2>
-                <p className="m-0 text-muted">Add RSS or Atom feeds. Cron and manual runs import new items as unpublished media.</p>
+                <p className="m-0 text-muted">Add RSS or Atom feeds. Cron and manual runs import and publish new media automatically.</p>
               </div>
               <form action={runIngestion}>
                 <button className="rounded-lg border border-ink bg-ink px-5 py-2 font-black text-white" type="submit">

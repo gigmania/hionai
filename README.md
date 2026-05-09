@@ -73,8 +73,8 @@ The default Vercel cron schedule runs once daily at 12:00 UTC. Use the `/admin` 
 - `/api/launches/submit` validates submissions and inserts them as unpublished launches.
 - `/admin` shows pending and published launches.
 - Admins can publish, rank, score, or unpublish launches.
-- `/admin` also manages RSS/Atom sources and imported media review.
-- `/api/cron/ingest` fetches active source feeds, dedupes raw items, and creates unpublished media items for review.
+- `/admin` also manages RSS/Atom sources and imported media.
+- `/api/cron/ingest` fetches active source feeds, dedupes raw items, and auto-publishes imported media items.
 - The admin Sources panel has a manual **Run ingestion** button for immediate imports.
 - The schema seeds starter feeds for OpenAI News, arXiv cs.AI, arXiv cs.LG, and Hacker News.
 

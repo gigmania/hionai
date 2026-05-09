@@ -93,9 +93,10 @@ export async function ingestSources(): Promise<IngestResult> {
             source: source.name,
             type: source.category === "podcast" ? "Podcast" : source.category === "video" ? "Video" : "News",
             title: item.title,
-            why: item.summary || "Imported from source feed. Add editorial context before publishing.",
+            why: item.summary || "Imported from source feed.",
             url: item.url,
-            published: false
+            published: true,
+            published_at: new Date().toISOString()
           },
           {
             onConflict: "title",
@@ -133,7 +134,7 @@ export async function ingestSources(): Promise<IngestResult> {
     rawInserted,
     mediaInserted,
     errors,
-    message: "Ingestion completed. Imported items are unpublished until reviewed in admin.",
+    message: "Ingestion completed. Imported media items were published automatically.",
     ingestedAt: new Date().toISOString()
   };
 }
