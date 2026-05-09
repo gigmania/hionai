@@ -22,6 +22,10 @@ export type MarketSignal = {
   probability: number;
   move: number;
   venue: string;
+  source?: string | null;
+  url?: string | null;
+  volume?: number | null;
+  liquidity?: number | null;
 };
 
 export type FeedItem = {
@@ -132,25 +136,41 @@ export const marketSignals: MarketSignal[] = [
     question: "Frontier model released before quarter end",
     probability: 64,
     move: 8,
-    venue: "Prediction markets"
+    venue: "Prediction markets",
+    source: "Seed",
+    url: null,
+    volume: 125000,
+    liquidity: 22000
   },
   {
     question: "Open-weight model tops coding benchmark",
     probability: 51,
     move: 5,
-    venue: "Model markets"
+    venue: "Model markets",
+    source: "Seed",
+    url: null,
+    volume: 78000,
+    liquidity: 14000
   },
   {
     question: "Major AI regulation passes this year",
     probability: 38,
     move: -4,
-    venue: "Policy markets"
+    venue: "Policy markets",
+    source: "Seed",
+    url: null,
+    volume: 63000,
+    liquidity: 9000
   },
   {
     question: "AI infrastructure capex beats consensus",
     probability: 72,
     move: 0,
-    venue: "Equity-linked"
+    venue: "Equity-linked",
+    source: "Seed",
+    url: null,
+    volume: 101000,
+    liquidity: 18000
   }
 ];
 

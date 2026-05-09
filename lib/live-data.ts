@@ -61,8 +61,9 @@ export async function getMarketSignals(): Promise<MarketSignal[]> {
 
   const { data, error } = await supabase
     .from("market_signals")
-    .select("question,probability,move,venue")
+    .select("question,probability,move,venue,source,url,volume,liquidity")
     .eq("published", true)
+    .order("volume", { ascending: false, nullsFirst: false })
     .order("published_at", { ascending: false })
     .limit(20);
 

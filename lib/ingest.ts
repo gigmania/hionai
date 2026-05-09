@@ -1,3 +1,4 @@
+import { ingestPolymarket, type PolymarketIngestResult } from "@/lib/polymarket";
 import { parseFeed } from "@/lib/rss";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 
@@ -15,6 +16,7 @@ export type IngestResult = {
   activeSources?: number;
   rawInserted?: number;
   mediaInserted?: number;
+  polymarket?: PolymarketIngestResult;
   errors?: Array<{ source: string; error: string }>;
   message: string;
   ingestedAt: string;
@@ -129,14 +131,17 @@ export async function ingestSources(): Promise<IngestResult> {
     }
   }
 
+  const polymarket = await ingestPolymarket();
+
   return {
     ok: true,
     mode: "ready",
     activeSources: sources?.length ?? 0,
     rawInserted,
     mediaInserted,
+    polymarket,
     errors,
-    message: "Ingestion completed. Imported media items were published automatically.",
+    message: "Ingestion completed. Imported media items and Polymarket signals were published automatically.",
     ingestedAt: new Date().toISOString()
   };
 }

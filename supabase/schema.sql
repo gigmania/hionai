@@ -70,12 +70,23 @@ create table if not exists market_signals (
   probability integer not null check (probability between 0 and 100),
   move integer not null default 0,
   venue text not null,
+  source text,
+  external_id text,
+  url text,
+  volume numeric,
+  liquidity numeric,
   source_url text,
   published boolean not null default false,
   published_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table market_signals add column if not exists source text;
+alter table market_signals add column if not exists external_id text;
+alter table market_signals add column if not exists url text;
+alter table market_signals add column if not exists volume numeric;
+alter table market_signals add column if not exists liquidity numeric;
 
 create table if not exists media_items (
   id uuid primary key default gen_random_uuid(),
