@@ -15,6 +15,10 @@ export const revalidate = 60;
 
 export default async function Home() {
   const { launches, marketSignals, feedItems, researchItems, indexBaskets, dailyBriefing, isFallback } = await getHomeData();
+  const topLaunch = launches[0];
+  const topMarket = marketSignals[0];
+  const topMedia = feedItems[0];
+  const topResearch = researchItems[0];
 
   return (
     <PageShell>
@@ -63,6 +67,31 @@ export default async function Home() {
                 <span className="mt-1 block text-sm text-white/65">Live signal layer</span>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="border-b-4 border-ink bg-white py-8">
+          <div className="mx-auto grid w-[min(1180px,calc(100%-32px))] gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <article className="border-4 border-ink bg-[#ffe45c] p-5 shadow-[6px_6px_0_#101316]">
+              <p className="mb-2 font-mono text-xs font-black uppercase tracking-[0.14em]">Top story</p>
+              <h2 className="mb-3 text-xl font-black leading-tight">{topMedia?.title}</h2>
+              <p className="m-0 font-mono text-xs uppercase text-ink/70">heat {topMedia?.popularity_score ?? 0}</p>
+            </article>
+            <article className="border-4 border-ink bg-white p-5">
+              <p className="mb-2 font-mono text-xs font-black uppercase tracking-[0.14em]">Market signal</p>
+              <h2 className="mb-3 text-xl font-black leading-tight">{topMarket?.question}</h2>
+              <p className="m-0 font-mono text-xs uppercase text-muted">{topMarket?.probability ?? 0}% / {topMarket?.source ?? topMarket?.venue}</p>
+            </article>
+            <article className="border-4 border-ink bg-white p-5">
+              <p className="mb-2 font-mono text-xs font-black uppercase tracking-[0.14em]">Research</p>
+              <h2 className="mb-3 text-xl font-black leading-tight">{topResearch?.title}</h2>
+              <p className="m-0 font-mono text-xs uppercase text-muted">{topResearch?.label}</p>
+            </article>
+            <article className="border-4 border-ink bg-white p-5">
+              <p className="mb-2 font-mono text-xs font-black uppercase tracking-[0.14em]">Launch</p>
+              <h2 className="mb-3 text-xl font-black leading-tight">{topLaunch?.name}</h2>
+              <p className="m-0 font-mono text-xs uppercase text-muted">+{topLaunch?.momentum ?? 0} momentum</p>
+            </article>
           </div>
         </section>
 

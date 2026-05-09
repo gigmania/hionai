@@ -1,21 +1,27 @@
 import { PageShell } from "@/components/page-shell";
 import { SectionHeading } from "@/components/section-heading";
-import { getAdminLaunches, getAdminMediaItems, getAdminSources } from "@/lib/admin-data";
+import { getAdminIngestionRuns, getAdminLaunches, getAdminMediaItems, getAdminSources } from "@/lib/admin-data";
 import { createSource, publishLaunch, publishMediaItem, runIngestion, unpublishLaunch, unpublishMediaItem } from "./actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const [{ launches, error: launchError }, { mediaItems, error: mediaError }, { sources, error: sourceError }] = await Promise.all([
+  const [
+    { launches, error: launchError },
+    { mediaItems, error: mediaError },
+    { sources, error: sourceError },
+    { runs, error: runsError }
+  ] = await Promise.all([
     getAdminLaunches(),
     getAdminMediaItems(),
-    getAdminSources()
+    getAdminSources(),
+    getAdminIngestionRuns()
   ]);
   const pending = launches.filter((launch) => !launch.published);
   const published = launches.filter((launch) => launch.published);
   const pendingMedia = mediaItems.filter((item) => !item.published);
   const publishedMedia = mediaItems.filter((item) => item.published);
-  const error = launchError ?? mediaError ?? sourceError;
+  const error = launchError ?? mediaError ?? sourceError ?? runsError;
 
   return (
     <PageShell>
@@ -26,6 +32,35 @@ export default async function AdminPage() {
           </SectionHeading>
 
           {error ? <div className="rounded-lg border border-ember bg-white p-5 font-bold text-ember">{error}</div> : null}
+
+          <section className="grid gap-4 rounded-lg border border-line bg-white p-5">
+            <h2 className="text-2xl font-black">Ingestion runs</h2>
+            {runs.length === 0 ? <p className="text-muted">No ingestion runs logged yet.</p> : null}
+            <div className="grid gap-3">
+              {runs.map((run) => (
+                <article className="rounded-lg border border-line bg-paper p-4" key={run.id}>
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                    <p className="m-0 font-mono text-xs font-black uppercase tracking-wide text-ocean">
+                      {run.status} / {new Date(run.started_at).toLocaleString()}
+                    </p>
+                    <span className="rounded-full border border-line bg-white px-3 py-1 font-mono text-[0.68rem] font-black uppercase">
+                      sources {run.active_sources}
+                    </span>
+                  </div>
+                  <div className="grid gap-2 font-mono text-xs text-muted md:grid-cols-5">
+                    <span>media {run.media_inserted}</span>
+                    <span>raw {run.raw_inserted}</span>
+                    <span>poly {run.polymarket_upserted}</span>
+                    <span>kalshi {run.kalshi_upserted}</span>
+                    <span>arxiv {run.arxiv_upserted}</span>
+                  </div>
+                  {run.errors.length > 0 ? (
+                    <p className="mt-3 text-sm font-bold text-ember">{JSON.stringify(run.errors).slice(0, 260)}</p>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          </section>
 
           <section className="grid gap-4 rounded-lg border border-line bg-white p-5">
             <div className="flex flex-wrap items-start justify-between gap-4">

@@ -49,6 +49,21 @@ create table if not exists raw_ingest_items (
   unique (source_id, external_id)
 );
 
+create table if not exists ingestion_runs (
+  id uuid primary key default gen_random_uuid(),
+  status text not null default 'success',
+  started_at timestamptz not null default now(),
+  finished_at timestamptz,
+  active_sources integer not null default 0,
+  raw_inserted integer not null default 0,
+  media_inserted integer not null default 0,
+  polymarket_upserted integer not null default 0,
+  kalshi_upserted integer not null default 0,
+  arxiv_upserted integer not null default 0,
+  errors jsonb not null default '[]'::jsonb,
+  summary text
+);
+
 create table if not exists launches (
   id uuid primary key default gen_random_uuid(),
   rank integer not null default 999,
@@ -184,6 +199,7 @@ for each row execute function set_updated_at();
 
 alter table sources enable row level security;
 alter table raw_ingest_items enable row level security;
+alter table ingestion_runs enable row level security;
 alter table launches enable row level security;
 alter table market_signals enable row level security;
 alter table media_items enable row level security;
@@ -197,6 +213,10 @@ for select using (is_active = true);
 
 drop policy if exists "Raw ingest items are private" on raw_ingest_items;
 create policy "Raw ingest items are private" on raw_ingest_items
+for select using (false);
+
+drop policy if exists "Ingestion runs are private" on ingestion_runs;
+create policy "Ingestion runs are private" on ingestion_runs
 for select using (false);
 
 drop policy if exists "Public can read published launches" on launches;

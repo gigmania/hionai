@@ -1,4 +1,6 @@
 import { ingestPolymarket, type PolymarketIngestResult } from "@/lib/polymarket";
+import { ingestArxiv, type ArxivIngestResult } from "@/lib/arxiv";
+import { ingestKalshi, type KalshiIngestResult } from "@/lib/kalshi";
 import { parseFeed } from "@/lib/rss";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 
@@ -17,6 +19,8 @@ export type IngestResult = {
   rawInserted?: number;
   mediaInserted?: number;
   polymarket?: PolymarketIngestResult;
+  kalshi?: KalshiIngestResult;
+  arxiv?: ArxivIngestResult;
   errors?: Array<{ source: string; error: string }>;
   message: string;
   ingestedAt: string;
@@ -53,6 +57,7 @@ export async function ingestSources(): Promise<IngestResult> {
   let rawInserted = 0;
   let mediaInserted = 0;
   const errors: Array<{ source: string; error: string }> = [];
+  const startedAt = new Date().toISOString();
 
   for (const source of (sources ?? []) as SourceRow[]) {
     if (!source.feed_url) continue;
@@ -131,7 +136,29 @@ export async function ingestSources(): Promise<IngestResult> {
     }
   }
 
-  const polymarket = await ingestPolymarket();
+  const [polymarket, kalshi, arxiv] = await Promise.all([ingestPolymarket(), ingestKalshi(), ingestArxiv()]);
+  const allErrors = [
+    ...errors,
+    ...polymarket.errors.map((error) => ({ source: "Polymarket", error })),
+    ...kalshi.errors.map((error) => ({ source: "Kalshi", error })),
+    ...arxiv.errors.map((error) => ({ source: "arXiv", error }))
+  ];
+  const status = allErrors.length > 0 ? "partial" : "success";
+  const message = "Ingestion completed. Imported media, market signals, and research items were published automatically.";
+
+  await supabase.from("ingestion_runs").insert({
+    status,
+    started_at: startedAt,
+    finished_at: new Date().toISOString(),
+    active_sources: sources?.length ?? 0,
+    raw_inserted: rawInserted,
+    media_inserted: mediaInserted,
+    polymarket_upserted: polymarket.marketsUpserted,
+    kalshi_upserted: kalshi.marketsUpserted,
+    arxiv_upserted: arxiv.papersUpserted,
+    errors: allErrors,
+    summary: message
+  });
 
   return {
     ok: true,
@@ -140,8 +167,10 @@ export async function ingestSources(): Promise<IngestResult> {
     rawInserted,
     mediaInserted,
     polymarket,
-    errors,
-    message: "Ingestion completed. Imported media items and Polymarket signals were published automatically.",
+    kalshi,
+    arxiv,
+    errors: allErrors,
+    message,
     ingestedAt: new Date().toISOString()
   };
 }

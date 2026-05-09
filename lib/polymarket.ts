@@ -4,6 +4,9 @@ type PolymarketMarket = {
   id?: string | number;
   conditionId?: string;
   slug?: string;
+  eventSlug?: string;
+  event?: { slug?: string };
+  events?: Array<{ slug?: string }>;
   question?: string;
   title?: string;
   active?: boolean;
@@ -22,6 +25,7 @@ type PolymarketMarket = {
 
 type PublicSearchResponse = {
   events?: Array<{
+    slug?: string;
     markets?: PolymarketMarket[];
   }>;
   markets?: PolymarketMarket[];
@@ -97,7 +101,8 @@ function isAiMarket(market: PolymarketMarket) {
 }
 
 function marketUrl(market: PolymarketMarket) {
-  return market.slug ? `https://polymarket.com/event/${market.slug}` : "https://polymarket.com/markets";
+  const slug = market.eventSlug ?? market.event?.slug ?? market.events?.[0]?.slug ?? market.slug;
+  return slug ? `https://polymarket.com/event/${slug}` : "https://polymarket.com/markets";
 }
 
 function normalizeMarket(market: PolymarketMarket) {
@@ -159,7 +164,10 @@ export async function ingestPolymarket(): Promise<PolymarketIngestResult> {
       }
 
       const payload = (await response.json()) as PublicSearchResponse;
-      const found = [...(payload.markets ?? []), ...(payload.events ?? []).flatMap((event) => event.markets ?? [])];
+      const found = [
+        ...(payload.markets ?? []),
+        ...(payload.events ?? []).flatMap((event) => (event.markets ?? []).map((market) => ({ ...market, eventSlug: event.slug })))
+      ];
 
       for (const market of found) {
         const key = String(market.conditionId ?? market.id ?? market.slug ?? market.question);

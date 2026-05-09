@@ -33,6 +33,21 @@ export type AdminSource = {
   last_error: string | null;
 };
 
+export type AdminIngestionRun = {
+  id: string;
+  status: string;
+  started_at: string;
+  finished_at: string | null;
+  active_sources: number;
+  raw_inserted: number;
+  media_inserted: number;
+  polymarket_upserted: number;
+  kalshi_upserted: number;
+  arxiv_upserted: number;
+  errors: Array<unknown>;
+  summary: string | null;
+};
+
 function missingSupabaseError() {
   return "SUPABASE_SERVICE_ROLE_KEY is not configured.";
 }
@@ -106,4 +121,27 @@ export async function getAdminSources() {
   }
 
   return { sources: (data ?? []) as AdminSource[], error: null };
+}
+
+export async function getAdminIngestionRuns() {
+  const supabase = createSupabaseServiceClient();
+
+  if (!supabase) {
+    return {
+      runs: [] as AdminIngestionRun[],
+      error: missingSupabaseError()
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("ingestion_runs")
+    .select("id,status,started_at,finished_at,active_sources,raw_inserted,media_inserted,polymarket_upserted,kalshi_upserted,arxiv_upserted,errors,summary")
+    .order("started_at", { ascending: false })
+    .limit(10);
+
+  if (error) {
+    return { runs: [] as AdminIngestionRun[], error: error.message };
+  }
+
+  return { runs: (data ?? []) as AdminIngestionRun[], error: null };
 }
