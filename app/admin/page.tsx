@@ -47,9 +47,10 @@ export default async function AdminPage() {
                       sources {run.active_sources}
                     </span>
                   </div>
-                  <div className="grid gap-2 font-mono text-xs text-muted md:grid-cols-5">
+                  <div className="grid gap-2 font-mono text-xs text-muted md:grid-cols-6">
                     <span>media {run.media_inserted}</span>
                     <span>raw {run.raw_inserted}</span>
+                    <span>ph {run.product_hunt_upserted}</span>
                     <span>poly {run.polymarket_upserted}</span>
                     <span>kalshi {run.kalshi_upserted}</span>
                     <span>arxiv {run.arxiv_upserted}</span>

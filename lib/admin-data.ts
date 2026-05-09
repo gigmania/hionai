@@ -41,6 +41,7 @@ export type AdminIngestionRun = {
   active_sources: number;
   raw_inserted: number;
   media_inserted: number;
+  product_hunt_upserted: number;
   polymarket_upserted: number;
   kalshi_upserted: number;
   arxiv_upserted: number;
@@ -135,7 +136,7 @@ export async function getAdminIngestionRuns() {
 
   const { data, error } = await supabase
     .from("ingestion_runs")
-    .select("id,status,started_at,finished_at,active_sources,raw_inserted,media_inserted,polymarket_upserted,kalshi_upserted,arxiv_upserted,errors,summary")
+    .select("id,status,started_at,finished_at,active_sources,raw_inserted,media_inserted,product_hunt_upserted,polymarket_upserted,kalshi_upserted,arxiv_upserted,errors,summary")
     .order("started_at", { ascending: false })
     .limit(10);
 

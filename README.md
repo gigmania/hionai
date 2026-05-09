@@ -30,6 +30,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 CRON_SECRET=
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=
+PRODUCT_HUNT_TOKEN=
 ```
 
 ## Supabase Setup
@@ -41,6 +42,7 @@ ADMIN_PASSWORD=
 5. Copy the service role key into Vercel as `SUPABASE_SERVICE_ROLE_KEY`.
 6. Set `CRON_SECRET` to a long random string.
 7. Set `ADMIN_PASSWORD` to protect `/admin` with basic auth. Optionally set `ADMIN_USERNAME`.
+8. Optional: set `PRODUCT_HUNT_TOKEN` to ingest AI launches from Product Hunt.
 
 Public reads are protected by row level security policies that only expose published rows. Server-side ingestion should use the service role key from API routes or cron jobs only.
 
@@ -83,6 +85,11 @@ The default Vercel cron schedule runs once daily at 12:00 UTC. Use the `/admin` 
 - `/admin` shows recent ingestion run logs with media, Polymarket, Kalshi, arXiv, and error counts.
 - `/markets` shows top 100 markets overall and can filter to the top 100 by source.
 - `/models` lists tracked AI models and links to detail pages for each model.
+- Ingestion imports Product Hunt posts when `PRODUCT_HUNT_TOKEN` is configured and filters for AI-related launches.
+
+## Model Freshness
+
+The current `/models` page uses an expanded seed list. To keep it current long term, models should move into Supabase and be updated by provider/model-card ingestion from official model docs, release feeds, and curated admin edits. Treat the seed list as the initial index, not the final source of truth.
 
 The admin route is open in local/dev when `ADMIN_PASSWORD` is unset. In production, set `ADMIN_PASSWORD`.
 On Vercel/production, `/admin` fails closed with a 503 if `ADMIN_PASSWORD` is missing.

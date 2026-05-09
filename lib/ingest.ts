@@ -1,6 +1,7 @@
 import { ingestPolymarket, type PolymarketIngestResult } from "@/lib/polymarket";
 import { ingestArxiv, type ArxivIngestResult } from "@/lib/arxiv";
 import { ingestKalshi, type KalshiIngestResult } from "@/lib/kalshi";
+import { ingestProductHunt, type ProductHuntIngestResult } from "@/lib/product-hunt";
 import { parseFeed } from "@/lib/rss";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 
@@ -18,6 +19,7 @@ export type IngestResult = {
   activeSources?: number;
   rawInserted?: number;
   mediaInserted?: number;
+  productHunt?: ProductHuntIngestResult;
   polymarket?: PolymarketIngestResult;
   kalshi?: KalshiIngestResult;
   arxiv?: ArxivIngestResult;
@@ -136,9 +138,15 @@ export async function ingestSources(): Promise<IngestResult> {
     }
   }
 
-  const [polymarket, kalshi, arxiv] = await Promise.all([ingestPolymarket(), ingestKalshi(), ingestArxiv()]);
+  const [productHunt, polymarket, kalshi, arxiv] = await Promise.all([
+    ingestProductHunt(),
+    ingestPolymarket(),
+    ingestKalshi(),
+    ingestArxiv()
+  ]);
   const allErrors = [
     ...errors,
+    ...productHunt.errors.map((error) => ({ source: "Product Hunt", error })),
     ...polymarket.errors.map((error) => ({ source: "Polymarket", error })),
     ...kalshi.errors.map((error) => ({ source: "Kalshi", error })),
     ...arxiv.errors.map((error) => ({ source: "arXiv", error }))
@@ -153,6 +161,7 @@ export async function ingestSources(): Promise<IngestResult> {
     active_sources: sources?.length ?? 0,
     raw_inserted: rawInserted,
     media_inserted: mediaInserted,
+    product_hunt_upserted: productHunt.postsUpserted,
     polymarket_upserted: polymarket.marketsUpserted,
     kalshi_upserted: kalshi.marketsUpserted,
     arxiv_upserted: arxiv.papersUpserted,
@@ -166,6 +175,7 @@ export async function ingestSources(): Promise<IngestResult> {
     activeSources: sources?.length ?? 0,
     rawInserted,
     mediaInserted,
+    productHunt,
     polymarket,
     kalshi,
     arxiv,

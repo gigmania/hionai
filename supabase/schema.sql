@@ -57,12 +57,15 @@ create table if not exists ingestion_runs (
   active_sources integer not null default 0,
   raw_inserted integer not null default 0,
   media_inserted integer not null default 0,
+  product_hunt_upserted integer not null default 0,
   polymarket_upserted integer not null default 0,
   kalshi_upserted integer not null default 0,
   arxiv_upserted integer not null default 0,
   errors jsonb not null default '[]'::jsonb,
   summary text
 );
+
+alter table ingestion_runs add column if not exists product_hunt_upserted integer not null default 0;
 
 create table if not exists launches (
   id uuid primary key default gen_random_uuid(),
@@ -73,11 +76,20 @@ create table if not exists launches (
   momentum integer not null default 0 check (momentum between 0 and 100),
   status launch_status not null default 'watch',
   source_url text,
+  source text,
+  external_id text,
+  votes_count integer not null default 0,
+  launched_at timestamptz,
   published boolean not null default false,
   published_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table launches add column if not exists source text;
+alter table launches add column if not exists external_id text;
+alter table launches add column if not exists votes_count integer not null default 0;
+alter table launches add column if not exists launched_at timestamptz;
 
 create table if not exists market_signals (
   id uuid primary key default gen_random_uuid(),

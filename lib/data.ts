@@ -16,6 +16,10 @@ export type Launch = {
   summary: string;
   momentum: number;
   status: "hot" | "rising" | "watch";
+  source?: string | null;
+  source_url?: string | null;
+  votes_count?: number | null;
+  launched_at?: string | null;
 };
 
 export type MarketSignal = {
@@ -259,6 +263,39 @@ export const researchItems: ResearchItem[] = [
 
 export const aiModels: AiModel[] = [
   {
+    slug: "gpt-5-5",
+    name: "GPT-5.5",
+    maker: "OpenAI",
+    summary: "OpenAI frontier model used for complex coding, research, agentic workflows, and real-world professional work.",
+    strengths: ["Deep reasoning", "Coding", "Research", "Agentic workflows"],
+    context: "Large",
+    modality: "Text, tools, multimodal-capable workflows",
+    access: "OpenAI API and ChatGPT",
+    detailUrl: "https://platform.openai.com/docs/models"
+  },
+  {
+    slug: "gpt-5-4",
+    name: "GPT-5.4",
+    maker: "OpenAI",
+    summary: "Strong general-purpose OpenAI model for everyday coding, analysis, writing, and application workflows.",
+    strengths: ["Coding", "Analysis", "Tool use", "General assistant tasks"],
+    context: "Large",
+    modality: "Text and tool use",
+    access: "OpenAI API and ChatGPT",
+    detailUrl: "https://platform.openai.com/docs/models"
+  },
+  {
+    slug: "gpt-5-3-codex",
+    name: "GPT-5.3 Codex",
+    maker: "OpenAI",
+    summary: "Coding-optimized OpenAI model focused on repository work, implementation, refactors, and debugging.",
+    strengths: ["Code generation", "Repo navigation", "Debugging", "Refactoring"],
+    context: "Large",
+    modality: "Text and code",
+    access: "OpenAI API and Codex",
+    detailUrl: "https://platform.openai.com/docs/models"
+  },
+  {
     slug: "gpt-4o",
     name: "GPT-4o",
     maker: "OpenAI",
@@ -281,12 +318,34 @@ export const aiModels: AiModel[] = [
     detailUrl: "https://www.anthropic.com/news/claude-3-5-sonnet"
   },
   {
+    slug: "claude-3-opus",
+    name: "Claude 3 Opus",
+    maker: "Anthropic",
+    summary: "Anthropic model known for high-quality reasoning, writing, and complex analysis across long documents.",
+    strengths: ["Reasoning", "Writing", "Long documents", "Analysis"],
+    context: "Large",
+    modality: "Text and vision",
+    access: "API and Claude",
+    detailUrl: "https://www.anthropic.com/claude"
+  },
+  {
     slug: "gemini-1-5-pro",
     name: "Gemini 1.5 Pro",
     maker: "Google DeepMind",
     summary: "A long-context multimodal model aimed at complex analysis across documents, code, video, and structured inputs.",
     strengths: ["Long context", "Multimodal analysis", "Google ecosystem", "Document reasoning"],
     context: "Very large",
+    modality: "Text, vision, audio, video",
+    access: "API and Gemini",
+    detailUrl: "https://deepmind.google/technologies/gemini/"
+  },
+  {
+    slug: "gemini-1-5-flash",
+    name: "Gemini 1.5 Flash",
+    maker: "Google DeepMind",
+    summary: "Fast multimodal Gemini model optimized for lower-latency and cost-sensitive high-volume workloads.",
+    strengths: ["Speed", "Cost efficiency", "Multimodal tasks", "Long context"],
+    context: "Large",
     modality: "Text, vision, audio, video",
     access: "API and Gemini",
     detailUrl: "https://deepmind.google/technologies/gemini/"
@@ -303,6 +362,17 @@ export const aiModels: AiModel[] = [
     detailUrl: "https://ai.meta.com/llama/"
   },
   {
+    slug: "llama-3-1-405b",
+    name: "Llama 3.1 405B",
+    maker: "Meta",
+    summary: "Large open-weight Llama model used for high-end self-hosted and fine-tuned applications.",
+    strengths: ["Open weights", "Fine-tuning", "Self-hosting", "Large model quality"],
+    context: "Large",
+    modality: "Text",
+    access: "Open weights",
+    detailUrl: "https://ai.meta.com/llama/"
+  },
+  {
     slug: "mistral-large",
     name: "Mistral Large",
     maker: "Mistral AI",
@@ -311,6 +381,17 @@ export const aiModels: AiModel[] = [
     context: "Large",
     modality: "Text",
     access: "API",
+    detailUrl: "https://mistral.ai/technology/"
+  },
+  {
+    slug: "mixtral-8x22b",
+    name: "Mixtral 8x22B",
+    maker: "Mistral AI",
+    summary: "Sparse mixture-of-experts open model used for efficient high-capability text generation and reasoning.",
+    strengths: ["Open model ecosystem", "Efficiency", "Multilingual", "Reasoning"],
+    context: "Large",
+    modality: "Text",
+    access: "Open weights and API",
     detailUrl: "https://mistral.ai/technology/"
   },
   {
@@ -323,6 +404,72 @@ export const aiModels: AiModel[] = [
     modality: "Text and code",
     access: "API and open weights",
     detailUrl: "https://www.deepseek.com/"
+  },
+  {
+    slug: "deepseek-v2",
+    name: "DeepSeek-V2",
+    maker: "DeepSeek",
+    summary: "Efficient mixture-of-experts model family used for general text, code, and cost-sensitive deployment.",
+    strengths: ["Efficiency", "Coding", "Open ecosystem", "Cost performance"],
+    context: "Large",
+    modality: "Text and code",
+    access: "API and open weights",
+    detailUrl: "https://www.deepseek.com/"
+  },
+  {
+    slug: "qwen-2-5",
+    name: "Qwen 2.5",
+    maker: "Alibaba Cloud",
+    summary: "Open model family with strong multilingual, coding, and general assistant capabilities across sizes.",
+    strengths: ["Multilingual", "Coding", "Open weights", "Multiple sizes"],
+    context: "Varies",
+    modality: "Text and code",
+    access: "API and open weights",
+    detailUrl: "https://qwenlm.github.io/"
+  },
+  {
+    slug: "command-r-plus",
+    name: "Command R+",
+    maker: "Cohere",
+    summary: "Enterprise-focused model optimized for retrieval-augmented generation, tool use, and business workflows.",
+    strengths: ["RAG", "Enterprise search", "Tool use", "Grounded generation"],
+    context: "Large",
+    modality: "Text",
+    access: "API",
+    detailUrl: "https://cohere.com/command"
+  },
+  {
+    slug: "grok",
+    name: "Grok",
+    maker: "xAI",
+    summary: "xAI assistant/model family integrated with X and positioned around real-time information access.",
+    strengths: ["Realtime context", "Consumer assistant", "Social signal", "General reasoning"],
+    context: "Large",
+    modality: "Text and multimodal variants",
+    access: "xAI and X",
+    detailUrl: "https://x.ai/"
+  },
+  {
+    slug: "stable-diffusion-3",
+    name: "Stable Diffusion 3",
+    maker: "Stability AI",
+    summary: "Image generation model family focused on prompt adherence, typography, and open creative workflows.",
+    strengths: ["Image generation", "Creative workflows", "Open ecosystem", "Prompt adherence"],
+    context: "Image model",
+    modality: "Image",
+    access: "API and model releases",
+    detailUrl: "https://stability.ai/"
+  },
+  {
+    slug: "runway-gen-3",
+    name: "Runway Gen-3",
+    maker: "Runway",
+    summary: "Video generation model family for cinematic generation, editing, and creative production workflows.",
+    strengths: ["Video generation", "Creative production", "Editing workflows", "Motion control"],
+    context: "Video model",
+    modality: "Video",
+    access: "Runway",
+    detailUrl: "https://runwayml.com/"
   }
 ];
 

@@ -16,8 +16,16 @@ export function LaunchCard({ launch }: { launch: Launch }) {
             {launch.status}
           </span>
         </div>
-        <p className="mb-2 text-sm font-bold text-ocean">{launch.category}</p>
+        <p className="mb-2 text-sm font-bold text-ocean">
+          {launch.source ?? launch.category}
+          {launch.votes_count ? ` / ${launch.votes_count.toLocaleString()} votes` : ""}
+        </p>
         <p className="m-0 text-muted">{launch.summary}</p>
+        {launch.source_url ? (
+          <a className="mt-3 inline-block text-sm font-bold text-moss hover:underline" href={launch.source_url}>
+            View launch
+          </a>
+        ) : null}
       </div>
       <strong className="text-right text-xl text-moss max-sm:col-start-2 max-sm:text-left">+{launch.momentum}</strong>
     </article>

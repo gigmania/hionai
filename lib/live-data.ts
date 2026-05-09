@@ -45,11 +45,12 @@ export async function getLaunches(): Promise<Launch[]> {
 
   const { data, error } = await supabase
     .from("launches")
-    .select("rank,name,category,summary,momentum,status")
+    .select("rank,name,category,summary,momentum,status,source,source_url,votes_count,launched_at")
     .eq("published", true)
+    .order("votes_count", { ascending: false, nullsFirst: false })
     .order("rank", { ascending: true })
     .order("momentum", { ascending: false })
-    .limit(25);
+    .limit(50);
 
   if (error) return seedLaunches;
   return fallbackIfEmpty(data as Launch[] | null, seedLaunches);
