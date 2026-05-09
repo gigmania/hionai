@@ -69,6 +69,11 @@ export type AiModel = {
   modality: string;
   access: string;
   detailUrl: string;
+  rank?: number;
+  source?: string | null;
+  sourceUrl?: string | null;
+  published?: boolean;
+  lastVerifiedAt?: string | null;
 };
 
 export const navItems = [

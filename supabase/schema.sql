@@ -61,11 +61,13 @@ create table if not exists ingestion_runs (
   polymarket_upserted integer not null default 0,
   kalshi_upserted integer not null default 0,
   arxiv_upserted integer not null default 0,
+  models_upserted integer not null default 0,
   errors jsonb not null default '[]'::jsonb,
   summary text
 );
 
 alter table ingestion_runs add column if not exists product_hunt_upserted integer not null default 0;
+alter table ingestion_runs add column if not exists models_upserted integer not null default 0;
 
 create table if not exists launches (
   id uuid primary key default gen_random_uuid(),
@@ -173,6 +175,34 @@ create table if not exists daily_briefings (
   unique (briefing_date, label)
 );
 
+create table if not exists ai_models (
+  id uuid primary key default gen_random_uuid(),
+  rank integer not null default 999,
+  slug text not null unique,
+  name text not null,
+  maker text not null,
+  summary text not null,
+  strengths text[] not null default '{}',
+  context text not null,
+  modality text not null,
+  access text not null,
+  detail_url text,
+  source text not null default 'Provider model card',
+  source_url text,
+  published boolean not null default false,
+  published_at timestamptz,
+  last_verified_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table ai_models add column if not exists rank integer not null default 999;
+alter table ai_models add column if not exists source text not null default 'Provider model card';
+alter table ai_models add column if not exists source_url text;
+alter table ai_models add column if not exists published boolean not null default false;
+alter table ai_models add column if not exists published_at timestamptz;
+alter table ai_models add column if not exists last_verified_at timestamptz;
+
 create or replace function set_updated_at()
 returns trigger as $$
 begin
@@ -209,6 +239,10 @@ drop trigger if exists set_daily_briefings_updated_at on daily_briefings;
 create trigger set_daily_briefings_updated_at before update on daily_briefings
 for each row execute function set_updated_at();
 
+drop trigger if exists set_ai_models_updated_at on ai_models;
+create trigger set_ai_models_updated_at before update on ai_models
+for each row execute function set_updated_at();
+
 alter table sources enable row level security;
 alter table raw_ingest_items enable row level security;
 alter table ingestion_runs enable row level security;
@@ -218,6 +252,7 @@ alter table media_items enable row level security;
 alter table research_items enable row level security;
 alter table index_baskets enable row level security;
 alter table daily_briefings enable row level security;
+alter table ai_models enable row level security;
 
 drop policy if exists "Public can read active sources" on sources;
 create policy "Public can read active sources" on sources
@@ -253,6 +288,10 @@ for select using (published = true);
 
 drop policy if exists "Public can read published daily briefings" on daily_briefings;
 create policy "Public can read published daily briefings" on daily_briefings
+for select using (published = true);
+
+drop policy if exists "Public can read published AI models" on ai_models;
+create policy "Public can read published AI models" on ai_models
 for select using (published = true);
 
 insert into launches (rank, name, category, summary, momentum, status, published, published_at)

@@ -1,11 +1,13 @@
 import {
   dailyBriefing as seedDailyBriefing,
   feedItems as seedFeedItems,
+  aiModels as seedAiModels,
   indexBaskets as seedIndexBaskets,
   launches as seedLaunches,
   marketSignals as seedMarketSignals,
   researchItems as seedResearchItems,
   type FeedItem,
+  type AiModel,
   type IndexBasket,
   type Launch,
   type MarketSignal,
@@ -37,6 +39,40 @@ const fallbackData: HomeData = {
 
 function fallbackIfEmpty<T>(rows: T[] | null | undefined, fallback: T[]) {
   return rows && rows.length > 0 ? rows : fallback;
+}
+
+type ModelRow = {
+  rank: number;
+  slug: string;
+  name: string;
+  maker: string;
+  summary: string;
+  strengths: string[];
+  context: string;
+  modality: string;
+  access: string;
+  detail_url: string | null;
+  source: string | null;
+  source_url: string | null;
+  last_verified_at: string | null;
+};
+
+function mapModel(row: ModelRow): AiModel {
+  return {
+    rank: row.rank,
+    slug: row.slug,
+    name: row.name,
+    maker: row.maker,
+    summary: row.summary,
+    strengths: row.strengths ?? [],
+    context: row.context,
+    modality: row.modality,
+    access: row.access,
+    detailUrl: row.detail_url ?? row.source_url ?? "#",
+    source: row.source,
+    sourceUrl: row.source_url,
+    lastVerifiedAt: row.last_verified_at
+  };
 }
 
 export async function getLaunches(): Promise<Launch[]> {
@@ -101,6 +137,38 @@ export async function getResearchItems(): Promise<ResearchItem[]> {
 
   if (error) return seedResearchItems;
   return fallbackIfEmpty(data as ResearchItem[] | null, seedResearchItems);
+}
+
+export async function getModels(): Promise<AiModel[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return seedAiModels;
+
+  const { data, error } = await supabase
+    .from("ai_models")
+    .select("rank,slug,name,maker,summary,strengths,context,modality,access,detail_url,source,source_url,last_verified_at")
+    .eq("published", true)
+    .order("rank", { ascending: true })
+    .order("name", { ascending: true })
+    .limit(100);
+
+  if (error) return seedAiModels;
+  const rows = (data ?? []) as ModelRow[];
+  return fallbackIfEmpty(rows.map(mapModel), seedAiModels);
+}
+
+export async function getModelBySlug(slug: string): Promise<AiModel | null> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return seedAiModels.find((model) => model.slug === slug) ?? null;
+
+  const { data, error } = await supabase
+    .from("ai_models")
+    .select("rank,slug,name,maker,summary,strengths,context,modality,access,detail_url,source,source_url,last_verified_at")
+    .eq("published", true)
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error) return seedAiModels.find((model) => model.slug === slug) ?? null;
+  return data ? mapModel(data as ModelRow) : seedAiModels.find((model) => model.slug === slug) ?? null;
 }
 
 export async function getIndexBaskets(): Promise<IndexBasket[]> {

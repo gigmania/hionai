@@ -82,14 +82,14 @@ The default Vercel cron schedule runs once daily at 12:00 UTC. Use the `/admin` 
 - `/media` ranks stories by `popularity_score`; anonymous up/down votes update that score.
 - Ingestion also searches Polymarket's public Gamma API for AI-related markets and publishes them to `/markets`.
 - Ingestion also imports open AI-related Kalshi markets and recent arXiv AI/ML/NLP papers.
-- `/admin` shows recent ingestion run logs with media, Polymarket, Kalshi, arXiv, and error counts.
+- `/admin` shows recent ingestion run logs with media, Product Hunt, Polymarket, Kalshi, arXiv, model-card, and error counts.
 - `/markets` shows top 100 markets overall and can filter to the top 100 by source.
-- `/models` lists tracked AI models and links to detail pages for each model.
+- `/models` reads published tracked AI models from Supabase and links to detail pages for each model.
 - Ingestion imports Product Hunt posts when `PRODUCT_HUNT_TOKEN` is configured and filters for AI-related launches.
 
 ## Model Freshness
 
-The current `/models` page uses an expanded seed list. To keep it current long term, models should move into Supabase and be updated by provider/model-card ingestion from official model docs, release feeds, and curated admin edits. Treat the seed list as the initial index, not the final source of truth.
+The `/models` page reads from the `ai_models` table and falls back to the local seed list if Supabase is unavailable or empty. Regular ingestion upserts provider model-card entries into Supabase, and `/admin` includes a model editor for ranking, publishing, and correcting model details. Treat the seed list as the bootstrap index; Supabase is the live source of truth after ingestion.
 
 The admin route is open in local/dev when `ADMIN_PASSWORD` is unset. In production, set `ADMIN_PASSWORD`.
 On Vercel/production, `/admin` fails closed with a 503 if `ADMIN_PASSWORD` is missing.

@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { PageShell } from "@/components/page-shell";
 import { SectionHeading } from "@/components/section-heading";
-import { aiModels } from "@/lib/data";
+import { getModels } from "@/lib/live-data";
 
-export default function ModelsPage() {
+export const revalidate = 60;
+
+export default async function ModelsPage() {
+  const models = await getModels();
+
   return (
     <PageShell>
       <main className="bg-paper py-16">
@@ -13,10 +17,10 @@ export default function ModelsPage() {
           </SectionHeading>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {aiModels.map((model, index) => (
+            {models.map((model, index) => (
               <Link className="group rounded-lg border border-line bg-white p-6 transition hover:border-ink" href={`/models/${model.slug}`} key={model.slug}>
                 <p className="mb-3 font-mono text-xs font-black uppercase tracking-[0.12em] text-ocean">
-                  {String(index + 1).padStart(2, "0")} / {model.maker}
+                  {String(model.rank ?? index + 1).padStart(2, "0")} / {model.maker}
                 </p>
                 <h2 className="mb-3 text-2xl font-black leading-tight group-hover:underline">{model.name}</h2>
                 <p className="mb-5 text-muted">{model.summary}</p>

@@ -45,8 +45,29 @@ export type AdminIngestionRun = {
   polymarket_upserted: number;
   kalshi_upserted: number;
   arxiv_upserted: number;
+  models_upserted: number;
   errors: Array<unknown>;
   summary: string | null;
+};
+
+export type AdminAiModel = {
+  id: string;
+  rank: number;
+  slug: string;
+  name: string;
+  maker: string;
+  summary: string;
+  strengths: string[];
+  context: string;
+  modality: string;
+  access: string;
+  detail_url: string | null;
+  source: string | null;
+  source_url: string | null;
+  published: boolean;
+  created_at: string;
+  published_at: string | null;
+  last_verified_at: string | null;
 };
 
 function missingSupabaseError() {
@@ -136,7 +157,7 @@ export async function getAdminIngestionRuns() {
 
   const { data, error } = await supabase
     .from("ingestion_runs")
-    .select("id,status,started_at,finished_at,active_sources,raw_inserted,media_inserted,product_hunt_upserted,polymarket_upserted,kalshi_upserted,arxiv_upserted,errors,summary")
+    .select("id,status,started_at,finished_at,active_sources,raw_inserted,media_inserted,product_hunt_upserted,polymarket_upserted,kalshi_upserted,arxiv_upserted,models_upserted,errors,summary")
     .order("started_at", { ascending: false })
     .limit(10);
 
@@ -145,4 +166,29 @@ export async function getAdminIngestionRuns() {
   }
 
   return { runs: (data ?? []) as AdminIngestionRun[], error: null };
+}
+
+export async function getAdminModels() {
+  const supabase = createSupabaseServiceClient();
+
+  if (!supabase) {
+    return {
+      models: [] as AdminAiModel[],
+      error: missingSupabaseError()
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("ai_models")
+    .select("id,rank,slug,name,maker,summary,strengths,context,modality,access,detail_url,source,source_url,published,created_at,published_at,last_verified_at")
+    .order("published", { ascending: true })
+    .order("rank", { ascending: true })
+    .order("name", { ascending: true })
+    .limit(150);
+
+  if (error) {
+    return { models: [] as AdminAiModel[], error: error.message };
+  }
+
+  return { models: (data ?? []) as AdminAiModel[], error: null };
 }

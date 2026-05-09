@@ -1,7 +1,17 @@
 import { PageShell } from "@/components/page-shell";
 import { SectionHeading } from "@/components/section-heading";
-import { getAdminIngestionRuns, getAdminLaunches, getAdminMediaItems, getAdminSources } from "@/lib/admin-data";
-import { createSource, publishLaunch, publishMediaItem, runIngestion, unpublishLaunch, unpublishMediaItem } from "./actions";
+import { getAdminIngestionRuns, getAdminLaunches, getAdminMediaItems, getAdminModels, getAdminSources } from "@/lib/admin-data";
+import {
+  createSource,
+  publishLaunch,
+  publishMediaItem,
+  publishModel,
+  runIngestion,
+  unpublishLaunch,
+  unpublishMediaItem,
+  unpublishModel,
+  upsertModel
+} from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -10,18 +20,22 @@ export default async function AdminPage() {
     { launches, error: launchError },
     { mediaItems, error: mediaError },
     { sources, error: sourceError },
-    { runs, error: runsError }
+    { runs, error: runsError },
+    { models, error: modelsError }
   ] = await Promise.all([
     getAdminLaunches(),
     getAdminMediaItems(),
     getAdminSources(),
-    getAdminIngestionRuns()
+    getAdminIngestionRuns(),
+    getAdminModels()
   ]);
   const pending = launches.filter((launch) => !launch.published);
   const published = launches.filter((launch) => launch.published);
   const pendingMedia = mediaItems.filter((item) => !item.published);
   const publishedMedia = mediaItems.filter((item) => item.published);
-  const error = launchError ?? mediaError ?? sourceError ?? runsError;
+  const pendingModels = models.filter((model) => !model.published);
+  const publishedModels = models.filter((model) => model.published);
+  const error = launchError ?? mediaError ?? sourceError ?? runsError ?? modelsError;
 
   return (
     <PageShell>
@@ -47,13 +61,14 @@ export default async function AdminPage() {
                       sources {run.active_sources}
                     </span>
                   </div>
-                  <div className="grid gap-2 font-mono text-xs text-muted md:grid-cols-6">
+                  <div className="grid gap-2 font-mono text-xs text-muted md:grid-cols-7">
                     <span>media {run.media_inserted}</span>
                     <span>raw {run.raw_inserted}</span>
                     <span>ph {run.product_hunt_upserted}</span>
                     <span>poly {run.polymarket_upserted}</span>
                     <span>kalshi {run.kalshi_upserted}</span>
                     <span>arxiv {run.arxiv_upserted}</span>
+                    <span>models {run.models_upserted}</span>
                   </div>
                   <details className="mt-3 rounded-lg border border-line bg-white p-3">
                     <summary className="cursor-pointer font-mono text-xs font-black uppercase tracking-wide">
@@ -133,6 +148,175 @@ export default async function AdminPage() {
                   {source.last_error ? <p className="mt-3 text-sm font-bold text-ember">{source.last_error}</p> : null}
                   {source.last_fetched_at ? <p className="mt-3 text-sm text-muted">Last fetched {new Date(source.last_fetched_at).toLocaleString()}</p> : null}
                 </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="grid gap-4 rounded-lg border border-line bg-white p-5">
+            <div>
+              <h2 className="mb-2 text-2xl font-black">Models</h2>
+              <p className="m-0 text-muted">
+                Provider model-card ingestion refreshes this list. Use the editor for corrections, ranking, and manual additions.
+              </p>
+            </div>
+
+            <details className="rounded-lg border border-line bg-paper p-4">
+              <summary className="cursor-pointer font-mono text-xs font-black uppercase tracking-wide">Add model</summary>
+              <form action={upsertModel} className="mt-4 grid gap-3 md:grid-cols-2">
+                <label className="grid gap-1 text-sm font-bold">
+                  Name
+                  <input className="rounded-lg border border-line px-3 py-2" name="name" placeholder="GPT-5.5" required />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  Slug
+                  <input className="rounded-lg border border-line px-3 py-2" name="slug" placeholder="gpt-5-5" />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  Maker
+                  <input className="rounded-lg border border-line px-3 py-2" name="maker" placeholder="OpenAI" required />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  Rank
+                  <input className="rounded-lg border border-line px-3 py-2" defaultValue="999" min="1" name="rank" type="number" />
+                </label>
+                <label className="grid gap-1 text-sm font-bold md:col-span-2">
+                  Summary
+                  <textarea className="min-h-24 rounded-lg border border-line px-3 py-2" name="summary" required />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  Strengths
+                  <input className="rounded-lg border border-line px-3 py-2" name="strengths" placeholder="Reasoning, Coding, Research" />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  Context
+                  <input className="rounded-lg border border-line px-3 py-2" name="context" placeholder="Large" />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  Modality
+                  <input className="rounded-lg border border-line px-3 py-2" name="modality" placeholder="Text, tools, multimodal" />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  Access
+                  <input className="rounded-lg border border-line px-3 py-2" name="access" placeholder="API and ChatGPT" />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  Detail URL
+                  <input className="rounded-lg border border-line px-3 py-2" name="detailUrl" placeholder="https://..." type="url" />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  Source URL
+                  <input className="rounded-lg border border-line px-3 py-2" name="sourceUrl" placeholder="https://..." type="url" />
+                </label>
+                <label className="grid gap-1 text-sm font-bold">
+                  Source
+                  <input className="rounded-lg border border-line px-3 py-2" defaultValue="Provider model card" name="source" />
+                </label>
+                <label className="flex items-center gap-2 self-end text-sm font-bold">
+                  <input defaultChecked name="published" type="checkbox" />
+                  Published
+                </label>
+                <button className="rounded-lg border border-ink bg-ink px-5 py-2 font-black text-white md:w-fit" type="submit">
+                  Save model
+                </button>
+              </form>
+            </details>
+
+            {pendingModels.length > 0 ? <h3 className="text-xl font-black">Pending models</h3> : null}
+            {pendingModels.map((model) => (
+              <article className="rounded-lg border border-line bg-paper p-4" key={model.id}>
+                <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="mb-1 text-xs font-black uppercase tracking-wide text-ocean">
+                      #{model.rank} / {model.maker}
+                    </p>
+                    <h3 className="mb-1 text-lg font-black">{model.name}</h3>
+                    <p className="m-0 text-muted">{model.summary}</p>
+                  </div>
+                  <form action={publishModel}>
+                    <input name="id" type="hidden" value={model.id} />
+                    <input name="slug" type="hidden" value={model.slug} />
+                    <button className="rounded-lg border border-ink bg-ink px-4 py-2 font-black text-white" type="submit">
+                      Publish
+                    </button>
+                  </form>
+                </div>
+              </article>
+            ))}
+
+            <h3 className="text-xl font-black">Published models</h3>
+            <div className="grid gap-3">
+              {publishedModels.map((model) => (
+                <details className="rounded-lg border border-line bg-paper p-4" key={model.id}>
+                  <summary className="cursor-pointer">
+                    <span className="font-black">{model.name}</span>
+                    <span className="ml-2 font-mono text-xs font-black uppercase tracking-wide text-muted">
+                      #{model.rank} / {model.maker}
+                    </span>
+                  </summary>
+                  <form action={upsertModel} className="mt-4 grid gap-3 md:grid-cols-2">
+                    <input name="id" type="hidden" value={model.id} />
+                    <label className="grid gap-1 text-sm font-bold">
+                      Name
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.name} name="name" required />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold">
+                      Slug
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.slug} name="slug" required />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold">
+                      Maker
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.maker} name="maker" required />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold">
+                      Rank
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.rank} min="1" name="rank" type="number" />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold md:col-span-2">
+                      Summary
+                      <textarea className="min-h-24 rounded-lg border border-line px-3 py-2" defaultValue={model.summary} name="summary" required />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold">
+                      Strengths
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.strengths.join(", ")} name="strengths" />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold">
+                      Context
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.context} name="context" />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold">
+                      Modality
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.modality} name="modality" />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold">
+                      Access
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.access} name="access" />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold">
+                      Detail URL
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.detail_url ?? ""} name="detailUrl" type="url" />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold">
+                      Source URL
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.source_url ?? ""} name="sourceUrl" type="url" />
+                    </label>
+                    <label className="grid gap-1 text-sm font-bold">
+                      Source
+                      <input className="rounded-lg border border-line px-3 py-2" defaultValue={model.source ?? "Provider model card"} name="source" />
+                    </label>
+                    <label className="flex items-center gap-2 self-end text-sm font-bold">
+                      <input defaultChecked={model.published} name="published" type="checkbox" />
+                      Published
+                    </label>
+                    <div className="flex flex-wrap gap-3 md:col-span-2">
+                      <button className="rounded-lg border border-ink bg-ink px-5 py-2 font-black text-white" type="submit">
+                        Save model
+                      </button>
+                      <button className="rounded-lg border border-line px-5 py-2 font-black" formAction={unpublishModel} type="submit">
+                        Unpublish
+                      </button>
+                    </div>
+                  </form>
+                </details>
               ))}
             </div>
           </section>
