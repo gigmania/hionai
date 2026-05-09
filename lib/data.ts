@@ -334,26 +334,70 @@ export const aiModels: AiModel[] = [
     detailUrl: "https://www.anthropic.com/claude"
   },
   {
+    slug: "gemini-3-pro",
+    name: "Gemini 3 Pro",
+    maker: "Google DeepMind",
+    summary: "Google's preview flagship Gemini model for advanced reasoning, multimodal understanding, coding, and agentic workflows.",
+    strengths: ["Advanced reasoning", "Multimodal understanding", "Coding", "Agentic workflows"],
+    context: "1M input / 64k output",
+    modality: "Text, image, video, audio, PDF",
+    access: "API and Gemini",
+    detailUrl: "https://ai.google.dev/gemini-api/docs/gemini-3"
+  },
+  {
+    slug: "gemini-3-flash",
+    name: "Gemini 3 Flash",
+    maker: "Google DeepMind",
+    summary: "Google's balanced Gemini 3 model built for speed, scale, frontier intelligence, and multimodal application workflows.",
+    strengths: ["Speed", "Scale", "Multimodal tasks", "Reasoning"],
+    context: "1M input / 64k output",
+    modality: "Text, image, video, audio, PDF",
+    access: "API and Gemini",
+    detailUrl: "https://ai.google.dev/gemini-api/docs/gemini-3"
+  },
+  {
+    slug: "gemini-2-5-pro",
+    name: "Gemini 2.5 Pro",
+    maker: "Google DeepMind",
+    summary: "Google's stable thinking model for complex coding, reasoning, STEM, long documents, and multimodal analysis.",
+    strengths: ["Thinking", "Coding", "Long context", "Multimodal analysis"],
+    context: "1M input / 64k output",
+    modality: "Text, image, video, audio, PDF",
+    access: "API and Gemini",
+    detailUrl: "https://ai.google.dev/gemini-api/docs/models/gemini-v2"
+  },
+  {
+    slug: "gemini-2-5-flash",
+    name: "Gemini 2.5 Flash",
+    maker: "Google DeepMind",
+    summary: "Google's price-performance Gemini model for low-latency, high-volume tasks that still benefit from thinking.",
+    strengths: ["Low latency", "Cost efficiency", "Thinking", "High-volume tasks"],
+    context: "1M input / 64k output",
+    modality: "Text, image, video, audio",
+    access: "API and Gemini",
+    detailUrl: "https://ai.google.dev/gemini-api/docs/models/gemini-v2"
+  },
+  {
     slug: "gemini-1-5-pro",
     name: "Gemini 1.5 Pro",
     maker: "Google DeepMind",
-    summary: "A long-context multimodal model aimed at complex analysis across documents, code, video, and structured inputs.",
+    summary: "Legacy long-context Gemini model for documents, code, video, and structured inputs. Deprecated in the Gemini API after September 2025.",
     strengths: ["Long context", "Multimodal analysis", "Google ecosystem", "Document reasoning"],
-    context: "Very large",
+    context: "2M input / 8k output",
     modality: "Text, vision, audio, video",
-    access: "API and Gemini",
-    detailUrl: "https://deepmind.google/technologies/gemini/"
+    access: "Legacy API and Gemini references",
+    detailUrl: "https://ai.google.dev/gemini-api/docs/models/gemini"
   },
   {
     slug: "gemini-1-5-flash",
     name: "Gemini 1.5 Flash",
     maker: "Google DeepMind",
-    summary: "Fast multimodal Gemini model optimized for lower-latency and cost-sensitive high-volume workloads.",
+    summary: "Legacy fast Gemini model for lower-latency and cost-sensitive multimodal workloads.",
     strengths: ["Speed", "Cost efficiency", "Multimodal tasks", "Long context"],
     context: "Large",
     modality: "Text, vision, audio, video",
-    access: "API and Gemini",
-    detailUrl: "https://deepmind.google/technologies/gemini/"
+    access: "Legacy API and Gemini references",
+    detailUrl: "https://ai.google.dev/gemini-api/docs/models/gemini"
   },
   {
     slug: "llama-3-1",
