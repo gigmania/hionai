@@ -65,6 +65,8 @@ Supabase published tables
 Next.js pages with 60 second revalidation
 ```
 
+The default Vercel cron schedule runs once daily at 12:00 UTC. Use the `/admin` **Run ingestion** button for immediate imports, or increase the cron frequency later if the Vercel plan supports it.
+
 ## Admin and Submissions
 
 - `/submit` accepts public launch submissions.
