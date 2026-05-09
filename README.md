@@ -86,10 +86,11 @@ The default Vercel cron schedule runs once daily at 12:00 UTC. Use the `/admin` 
 - `/markets` shows top 100 markets overall and can filter to the top 100 by source.
 - `/models` reads published tracked AI models from Supabase and links to detail pages for each model.
 - Ingestion imports Product Hunt posts when `PRODUCT_HUNT_TOKEN` is configured and filters for AI-related launches.
+- Ingestion also reads Awesome-LLM trending model/project links and imports likely model matches as unpublished model candidates for admin review.
 
 ## Model Freshness
 
-The `/models` page reads from the `ai_models` table and falls back to the local seed list if Supabase is unavailable or empty. Regular ingestion upserts provider model-card entries into Supabase, and `/admin` includes a model editor for ranking, publishing, and correcting model details. Treat the seed list as the bootstrap index; Supabase is the live source of truth after ingestion.
+The `/models` page reads from the `ai_models` table and falls back to the local seed list if Supabase is unavailable or empty. Regular ingestion upserts provider model-card entries into Supabase, imports Awesome-LLM candidates as unpublished review items, and `/admin` includes a model editor for ranking, publishing, and correcting model details. Treat the seed list as the bootstrap index; Supabase is the live source of truth after ingestion.
 
 The admin route is open in local/dev when `ADMIN_PASSWORD` is unset. In production, set `ADMIN_PASSWORD`.
 On Vercel/production, `/admin` fails closed with a 503 if `ADMIN_PASSWORD` is missing.
