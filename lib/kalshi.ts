@@ -3,6 +3,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase";
 type KalshiMarket = {
   ticker?: string;
   event_ticker?: string;
+  series_ticker?: string;
   title?: string;
   subtitle?: string;
   yes_sub_title?: string;
@@ -74,6 +75,7 @@ const AI_KEYWORDS = [
 ];
 
 const MAX_PAGES = 8;
+const TARGET_SERIES_TICKERS = ["KXLLM1"];
 
 function numberValue(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -108,9 +110,11 @@ function normalizeMarket(market: KalshiMarket) {
   const previous = numberValue(market.previous_price_dollars);
   const current = probabilityFromMarket(market);
   const previousPct = previous === null ? current : Math.round(previous * 100);
+  const outcome = market.yes_sub_title ?? market.subtitle;
+  const question = outcome && !market.title.toLowerCase().includes(outcome.toLowerCase()) ? `${market.title} ${outcome}` : market.title;
 
   return {
-    question: market.title,
+    question,
     probability: Math.max(0, Math.min(100, current)),
     move: current - previousPct,
     venue: "Kalshi",
@@ -141,7 +145,49 @@ export async function ingestKalshi(): Promise<KalshiIngestResult> {
   const seen = new Set<string>();
   let markets: KalshiMarket[] = [];
 
+  async function fetchMarkets(params: URLSearchParams) {
+    const response = await fetch(`https://external-api.kalshi.com/trade-api/v2/markets?${params.toString()}`, {
+      headers: {
+        "User-Agent": "HIonAI/0.1 (+https://hionai.net)"
+      },
+      next: { revalidate: 0 }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Kalshi markets returned ${response.status}`);
+    }
+
+    return (await response.json()) as KalshiMarketsResponse;
+  }
+
+  function addMarket(market: KalshiMarket, force = false) {
+    const key = market.ticker ?? market.title;
+    if (!key || seen.has(key) || (!force && !isAiMarket(market))) return;
+    seen.add(key);
+    markets.push(market);
+  }
+
   try {
+    for (const seriesTicker of TARGET_SERIES_TICKERS) {
+      let cursor: string | undefined;
+
+      for (let page = 0; page < MAX_PAGES; page += 1) {
+        const params = new URLSearchParams({
+          limit: "1000",
+          status: "open",
+          series_ticker: seriesTicker
+        });
+
+        if (cursor) params.set("cursor", cursor);
+
+        const payload = await fetchMarkets(params);
+        for (const market of payload.markets ?? []) addMarket(market, true);
+
+        cursor = payload.cursor || undefined;
+        if (!cursor) break;
+      }
+    }
+
     let cursor: string | undefined;
 
     for (let page = 0; page < MAX_PAGES; page += 1) {
@@ -152,25 +198,8 @@ export async function ingestKalshi(): Promise<KalshiIngestResult> {
 
       if (cursor) params.set("cursor", cursor);
 
-      const response = await fetch(`https://external-api.kalshi.com/trade-api/v2/markets?${params.toString()}`, {
-        headers: {
-          "User-Agent": "HIonAI/0.1 (+https://hionai.net)"
-        },
-        next: { revalidate: 0 }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Kalshi markets returned ${response.status}`);
-      }
-
-      const payload = (await response.json()) as KalshiMarketsResponse;
-
-      for (const market of payload.markets ?? []) {
-        const key = market.ticker ?? market.title;
-        if (!key || seen.has(key) || !isAiMarket(market)) continue;
-        seen.add(key);
-        markets.push(market);
-      }
+      const payload = await fetchMarkets(params);
+      for (const market of payload.markets ?? []) addMarket(market);
 
       cursor = payload.cursor || undefined;
       if (!cursor) break;
