@@ -25,10 +25,16 @@ export type MarketSignal = {
 };
 
 export type FeedItem = {
+  id?: string;
   source: string;
   type: "News" | "Podcast" | "Video" | "Newsletter";
   title: string;
   why: string;
+  url?: string | null;
+  upvotes: number;
+  downvotes: number;
+  popularity_score: number;
+  published_at?: string | null;
 };
 
 export type ResearchItem = {
@@ -153,25 +159,41 @@ export const feedItems: FeedItem[] = [
     source: "Operator Brief",
     type: "News",
     title: "Enterprise AI budgets move from pilots to renewal scrutiny.",
-    why: "Procurement teams are asking for measurable workflow impact instead of demo velocity."
+    why: "Procurement teams are asking for measurable workflow impact instead of demo velocity.",
+    url: null,
+    upvotes: 42,
+    downvotes: 3,
+    popularity_score: 91
   },
   {
     source: "Founder Interview",
     type: "Podcast",
     title: "What real agent adoption looks like inside technical teams.",
-    why: "The adoption pattern is supervised queues first, autonomous work later."
+    why: "The adoption pattern is supervised queues first, autonomous work later.",
+    url: null,
+    upvotes: 31,
+    downvotes: 4,
+    popularity_score: 78
   },
   {
     source: "Benchmark Desk",
     type: "Video",
     title: "Why eval design now matters more than headline model scores.",
-    why: "Teams need task-specific regressions, not generalized leaderboard confidence."
+    why: "Teams need task-specific regressions, not generalized leaderboard confidence.",
+    url: null,
+    upvotes: 25,
+    downvotes: 2,
+    popularity_score: 72
   },
   {
     source: "Infra Weekly",
     type: "Newsletter",
     title: "Power constraints are becoming product constraints for AI platforms.",
-    why: "Data center availability is now a core competitive variable."
+    why: "Data center availability is now a core competitive variable.",
+    url: null,
+    upvotes: 19,
+    downvotes: 1,
+    popularity_score: 66
   }
 ];
 

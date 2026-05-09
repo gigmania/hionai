@@ -6,6 +6,7 @@ type SourceRow = {
   name: string;
   category: string;
   feed_url: string | null;
+  credibility_score?: number | null;
 };
 
 export type IngestResult = {
@@ -33,7 +34,7 @@ export async function ingestSources(): Promise<IngestResult> {
 
   const { data: sources, error: sourcesError } = await supabase
     .from("sources")
-    .select("id,name,category,feed_url")
+    .select("id,name,category,feed_url,credibility_score")
     .eq("is_active", true)
     .not("feed_url", "is", null)
     .limit(20);
@@ -95,6 +96,7 @@ export async function ingestSources(): Promise<IngestResult> {
             title: item.title,
             why: item.summary || "Imported from source feed.",
             url: item.url,
+            popularity_score: Math.max(1, Math.min(100, source.credibility_score ?? 50)),
             published: true,
             published_at: new Date().toISOString()
           },

@@ -76,8 +76,9 @@ export async function getFeedItems(): Promise<FeedItem[]> {
 
   const { data, error } = await supabase
     .from("media_items")
-    .select("source,type,title,why")
+    .select("id,source,type,title,why,url,upvotes,downvotes,popularity_score,published_at")
     .eq("published", true)
+    .order("popularity_score", { ascending: false })
     .order("published_at", { ascending: false })
     .limit(30);
 

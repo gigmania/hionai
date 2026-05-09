@@ -84,11 +84,18 @@ create table if not exists media_items (
   title text not null unique,
   why text not null,
   url text,
+  upvotes integer not null default 0 check (upvotes >= 0),
+  downvotes integer not null default 0 check (downvotes >= 0),
+  popularity_score integer not null default 0,
   published boolean not null default false,
   published_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table media_items add column if not exists upvotes integer not null default 0 check (upvotes >= 0);
+alter table media_items add column if not exists downvotes integer not null default 0 check (downvotes >= 0);
+alter table media_items add column if not exists popularity_score integer not null default 0;
 
 create table if not exists research_items (
   id uuid primary key default gen_random_uuid(),

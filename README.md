@@ -77,6 +77,7 @@ The default Vercel cron schedule runs once daily at 12:00 UTC. Use the `/admin` 
 - `/api/cron/ingest` fetches active source feeds, dedupes raw items, and auto-publishes imported media items.
 - The admin Sources panel has a manual **Run ingestion** button for immediate imports.
 - The schema seeds starter feeds for OpenAI News, arXiv cs.AI, arXiv cs.LG, and Hacker News.
+- `/media` ranks stories by `popularity_score`; anonymous up/down votes update that score.
 
 The admin route is open in local/dev when `ADMIN_PASSWORD` is unset. In production, set `ADMIN_PASSWORD`.
 On Vercel/production, `/admin` fails closed with a 503 if `ADMIN_PASSWORD` is missing.
